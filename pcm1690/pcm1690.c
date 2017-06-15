@@ -207,8 +207,8 @@ static int snd_pcm1690_audiocard_hw_params(
 {
 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
 	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
-	struct snd_soc_dai *codec_dai = rtd->codec_dai;
-	struct snd_soc_codec *codec = rtd->codec;
+	//struct snd_soc_dai *codec_dai = rtd->codec_dai;
+	//struct snd_soc_codec *codec = rtd->codec;
 	struct snd_soc_card *soc_card = rtd->card;
 	
 	unsigned int rate = params_rate(params);
@@ -278,7 +278,7 @@ static struct snd_soc_ops snd_pcm1690_audiocard_ops = {
 
 //in dsp_A, L data MSB after FRM LRC as in pcm1690 datasheet for TDM
 //set format to DSP_A, inverse frame, normal bitclock, and codec slave (pcm1690 is always set to slave mode)
-#define AUDIOCARD_1690_DAIFMT ( SND_SOC_DAI_FORMAT_DSP_A | SND_SOC_DAIFMT_NB_IF | SND_SOC_DAIFMT_CBS_CFS )
+#define AUDIOCARD_1690_DAIFMT ( SND_SOC_DAIFMT_DSP_A | SND_SOC_DAIFMT_NB_IF | SND_SOC_DAIFMT_CBS_CFS )
 
 //link between cpu dai and codec dai
 static struct snd_soc_dai_link BBB_snd_pcm1690_audiocard_dai = {
