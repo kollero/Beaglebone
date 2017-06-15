@@ -1,0 +1,183 @@
+//dtc -O dtb -o pcm1690-overlay-00A0.dtbo -b 0 -@ pcm1690-overlay.dts
+//sudo cp pcm1690-overlay-00A0.dtbo /boot/overlays
+
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "ti,beaglebone-black";
+	    /* identification */
+        part-number = "pcm1690-overlay";
+        version = "00A0";
+	
+	exclusive-use =
+		// audio 
+		"P9.42",	// mcasp0_axr2 		audio out 
+		"P9.27",	// mcasp0_axr3 		mic in 
+		"P9.30",	// mcasp0_axr1 		radio in 
+		"P9.31",	// mcasp0_aclkx		transmit bitclock 
+		"P9.29",	// mcasp0_fsx 		transmit framesync
+		"P9.25",	// mcasp0_ahclkx 	masterclock out
+		//"P9.28",	// mcasp0_ahclkr  	masterclock in
+		"P8.26",		//amute
+		"P9_14", // 4xkhz
+		"P9_16", //speed rate
+		"P9.24", //i2c
+        "P9.26",	//i2c
+		"GPIO1_27", //Y4 
+        //"i2c1_scl",
+        //"i2c1_sda",
+		"mcasp0","i2c1";
+	
+	
+	fragment@0 {
+		target = <&am33xx_pinmux>;
+		__overlay__ {
+			mcasp0_pins: pinmux_mcasp0_pins {
+				pinctrl-single,pins = <
+					0x198 0x20		// mcasp0_axr0,		MODE0 | INPUT_PULLDOWN | P9.30 
+					0x1a0 0x02		// mcasp0_axr2,		MODE2 | OUTPUT_PULLDOWN | P9.42 
+					0x1a4 0x22		// mcasp0_axr3,		MODE2 | INPUT_PULLDOWN | P9.27 					
+					0x194 0x20		// mcasp0_fsx, 		MODE0 | INPUT_PULLDOWN | P9.29  
+					0x190 0x20		// mcasp0_aclkx, 	MODE0 | INPUT_PULLDOWN | P9.31 
+					0x1ac 0x20		// mcasp0_ahclkx,	MODE0 | INPUT_PULLDOWN | P9.25 
+					//0x19c 0x20		// mcasp0_ahclkr,	MODE0 | INPUT_PULLDOWN | P9.28 
+				>;
+			};
+			
+			audiocard_i2c1_pins: pinmux_audiocard_i2c1_pins { 
+				pinctrl-single,pins = <
+					0x184 0x33		/* i2c1_scl, 	MODE3 | INPUT_PULLUP |  P9_24 */ 
+                    0x180 0x33		/* i2c1_sda, 	MODE3 | INPUT_PULLUP |  P9_26 */                    
+				>;
+			};
+			
+			amute_pins: pinmux_amute_pins { 
+				pinctrl-single,pins = <						
+                    0x07c 0x57		// amutepcm1690, 	MODE7 | OUTPUT_PULLUP 0b01010111|  P8_26                     
+				>;
+			};
+			clk_pins: pinmux_clk_pins { 
+				pinctrl-single,pins = <
+					0x04c 0x07		// speed, 	MODE7 | OUTPUT_PULLDOWN |  P9_16, gpio1 19	
+					0x048 0x07		// 44/48, 	MODE7 | OUTPUT_PULLDOWN |  P9_14, gpio1 18	
+					0x1a8 0x57		// Y4 oscillator on, v17 ball,	MODE7 | OUTPUT_PULLUP | GPIO1_27 
+					//0x1a8 0x07		// Y4 oscillator off, v17 ball,	MODE7 | OUTPUT_PULLDOWN | GPIO1_27 
+				>;
+			};
+			
+
+		};
+	};
+	
+	
+	fragment@1 {
+		target = <&i2c1>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&audiocard_i2c1_pins>;
+			status = "okay";
+			clock-frequency = <100000>; //100khz
+			
+			// avoid dtc warnings 			
+			#address-cells = <1>;
+			#size-cells = <0>;
+			
+			pcm1690: pcm1690@4c{
+				//#address-cells = <1>;
+				//#size-cells = <0>;
+				//#sound-dai-cells = <0>;
+				compatible = "ti,pcm1690";
+				reg = <0x4c>; //should be 4c
+				
+			};
+			
+			rtc: rtc@68 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+                compatible = "dallas,ds1307"; //really a DS3231
+                reg = <0x68>;
+            };
+			
+			//add other devices here that are in i2c-1 bus
+
+		};
+	};
+	
+	fragment@2 {
+		target = <&mcasp0>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&mcasp0_pins>;
+
+			status = "okay";
+		
+			op-mode = <0>;	/* MCASP_IIS_MODE */
+			tdm-slots = <8>;
+			num-serializer = <16>;
+			serial-dir = <  /* 0: INACTIVE, 1: TX, 2: RX */
+				0 0 1 0  //2 0 1 2
+				0 0 0 0
+				0 0 0 0
+				0 0 0 0
+			>;
+			tx-num-evt = <1>;
+			rx-num-evt = <0>; //2
+		};
+		
+    };
+	fragment@3 {
+		target = <&ocp>;
+		__overlay__ {
+			
+			amute {		
+				
+				pinctrl-names = "default";
+				pinctrl-0 = <&amute_pins>;
+				
+				amute_pcm1690	= <&gpio1 29 0x0>;
+			};
+			
+			clks {		
+			
+				pinctrl-names = "default";
+				pinctrl-0 = <&clk_pins>;
+				
+				speed_pin	= <&gpio1 19 0x0>;  //or $pin19, 0x04c 0x07 0x0
+				clk4x_pin	= <&gpio1 18 0x0>;  //or $pin18, 0x048 0x07 0x0
+			};
+			
+			
+			sound {				
+				compatible = "ti,soundcard-pcm1690";
+				model = "soundcard pcm1690";
+				audio-codec = <&pcm1690>;
+				mcasp-controller = <&mcasp0>;
+				audiocard-tdm-slots = <8>;
+				codec-clock-rate = <24576000>;
+				cpu-clock-rate = <24576000>;
+				//codec-clock-rate = <12880000>;
+				//cpu-clock-rate = <12880000>;
+				audio-codec-bit-delay-dac = <1>;
+				audio-codec-bit-delay-adc = <0>;
+				mcasp-controller-bit-delay-tx = <0>;
+				mcasp-controller-bit-delay-rx = <0>;
+				/*
+				audio-routing =
+					"Speaker Out",            "VOUT1",
+					"Speaker Out",            "VOUT2",
+					"Speaker Out",            "VOUT3",
+					"Speaker Out", 			  "VOUT4",
+					"Line Out",         	  "VOUT5",
+					"Line Out",          	  "VOUT6";
+					//"Line Out",             "VOUT7",
+					//"Line Out", 			 "VOUT8";
+				*/
+			};
+		};
+	};
+	
+	
+	
+	
+};
