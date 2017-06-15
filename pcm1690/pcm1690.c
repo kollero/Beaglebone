@@ -229,7 +229,7 @@ static int snd_pcm1690_audiocard_hw_params(
 		return ret;
 	}*/
 	dev_dbg(cpu_dai->dev, "Set codec DAI clock rate to %d.\n", codec_clock);
-	ret = snd_soc_dai_set_sysclk(cpu_dai, 0, cpu_clock, SND_SOC_CLOCK_OUT); //SND_SOC_CLOCK_OUT
+	ret = snd_soc_dai_set_sysclk(cpu_dai, 0, cpu_clock/(rate*256), SND_SOC_CLOCK_OUT); //SND_SOC_CLOCK_OUT
 	if (ret < 0){
 		dev_err(cpu_dai->dev, "Unable to set cpu dai sysclk: %d.\n", ret);
 		return ret;
