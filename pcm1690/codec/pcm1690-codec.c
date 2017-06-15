@@ -194,7 +194,7 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 			     struct snd_soc_dai *dai)
 {
 	
-	struct snd_soc_codec *codec = dai->codec;
+	struct snd_soc_codec *codec = codec_dai->codec;
 	struct pcm1690_private *priv = snd_soc_codec_get_drvdata(codec);
 	int val = 0, ret;
 
@@ -233,7 +233,7 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 			return -EINVAL;
 		}
 		break;
-	case SND_SOC_DAIFMT_LEFT_J: //left justified
+	/*case SND_SOC_DAIFMT_LEFT_J: //left justified
 		switch (params_width(params)) {
 			case 24:
 				val=0x07; //basic left justified TDM <=48khz
@@ -244,33 +244,36 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 			default:
 				val=0x01; //0001 left justified 16/20/24/32 stereo
 		}
-		break;
-	case SND_SOC_DAIFMT_DSP_A: //dsp A
+		break;*/
+	//on TDM mode this and dsp_b are the only modes that pcm1690 supports	
+	case SND_SOC_DAIFMT_DSP_A: // dsp_A, L data MSB after FRM LRC drops as in pcm1690 datasheet for TDM
 		switch (params_width(params)) {
 			case 24:
 				//val=0x04; //dsp i2s
-				//but since using TDM mode as dspA
 				val=0x06; //basic TDM <=48khz
 				if((priv->rate) > 48000){
 					val=0x08; //fast mode > 48khz	
 				}
-			default: //testing speaker-test doesn't support 24bit output
+				break;
+			default: //testing, speaker-test doesn't support 24bit output
 				val=0x06; //basic TDM <=48khz
 				if((priv->rate) > 48000){
 					val=0x08; //fast mode > 48khz
+					//dev_info(codec->dev, "fast mode");
 				}
+				//dev_info(codec->dev, "Used default DPS_A")			
 		}
 		break;	
 		
 	default:
-		val=0x06; //basic TDM <=48khz
+		/*val=0x06; //basic TDM <=48khz
 				if((priv->rate) > 48000){
 					val=0x08; //fast mode > 48khz	
 				}
 		dev_info(codec->dev, "Used default format");
-		
-		//dev_err(codec->dev, "Invalid sound output format\n");
-		//return -EINVAL;
+		*/
+		dev_err(codec->dev, "Invalid sound output format\n");
+		return -EINVAL;
 	}
 	
 	ret = regmap_update_bits(priv->regmap, PCM1690_FMT_CONTROL, 0x0f, val); //write format into pcm1690 register
@@ -284,7 +287,7 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 static int pcm1690_digital_mute(struct snd_soc_dai *dai, int mute)
 {
 	//struct snd_soc_codec *codec = dai->codec;
-	struct pcm1690_private *priv = snd_soc_codec_get_drvdata(dai->codec);
+	struct pcm1690_private *priv = snd_soc_codec_get_drvdata(codec);
 	int val;
 
 	if (mute)
