@@ -275,6 +275,11 @@ static struct snd_soc_ops snd_pcm1690_audiocard_ops = {
 	.shutdown = snd_pcm1690_audiocard_shutdown,
 };
 
+
+//in dsp_A, L data MSB after FRM LRC as in pcm1690 datasheet for TDM
+//set format to DSP_A, inverse frame, normal bitclock, and codec slave (pcm1690 is always set to slave mode)
+#define AUDIOCARD_1690_DAIFMT ( SND_SOC_DAI_FORMAT_DSP_A | SND_SOC_DAIFMT_NB_IF | SND_SOC_DAIFMT_CBS_CFS )
+
 //link between cpu dai and codec dai
 static struct snd_soc_dai_link BBB_snd_pcm1690_audiocard_dai = {
 	.name		= "pcm1690audiocard", //whatever name
@@ -284,8 +289,7 @@ static struct snd_soc_dai_link BBB_snd_pcm1690_audiocard_dai = {
 	.codec_dai_name	= "pcm1690-hifi", //from snd_soc_dai_driver .name 
 	//.platform_name	= "mcasp-controller", //not to be used
 	//.codec_name	= "pcm1690.1-004c", //i2c-1@4c, device tree will add this?!?
-	.dai_fmt	= SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF | //PCM data format i2s,normal bitclock and frame
-				SND_SOC_DAIFMT_CBS_CFS, //format slave, pcm1690 is a slave!
+	.dai_fmt	= AUDIOCARD_1690_DAIFMT,
 	.ops		= &snd_pcm1690_audiocard_ops,
 	.init		= snd_pcm1690_audiocard_init,
 };
