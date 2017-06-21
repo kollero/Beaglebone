@@ -1,6 +1,6 @@
 # Beaglebone
-pcm1690 drivers uses beaglebone internal 24.576MHz clock
-pcm1690 only uses currently default audio format and will force it to correct TDM mode, as dmesg will tell
+pcm1690 drivers uses beaglebones internal 24MHz clock
+pcm1690 only supports 24bit audio format in TDM mode
 
 make sure to run:
 
@@ -26,6 +26,8 @@ enable_uboot_overlays=1
 dtb_overlay=/lib/firmware/pcm1690-overlay-00A0.dtbo
 
 disable universal cape and hdmi audio
+
+to check if it really works cannot use speaker-test since it doesn't support 24bit...
 
 reboot and check if it works with:
 speaker-test -t sine -f 10000 -c 1 -r 48000
