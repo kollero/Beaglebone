@@ -6,12 +6,15 @@
 
 #include <linux/pm.h>
 #include <linux/regmap.h>
-
+/*
 #define PCM1690_FORMATS ( SNDRV_PCM_FMTBIT_S16_LE  	\
 			    |	 SNDRV_PCM_FMTBIT_S24_LE  		\
 				| SNDRV_PCM_FMTBIT_S32_LE ) 
 				 //last one not supported in TDM mode
+*/
+#define PCM1690_FORMATS ( SNDRV_PCM_FMTBIT_S24_LE  )
 
+				 
 				 //only 44.1 and 48khz multiple freqs is supported to the master clock with 256 fs single or dual rate
 #define PCM1690_PCM_RATES (	SNDRV_PCM_RATE_44100  |SNDRV_PCM_RATE_48000 \
 							| SNDRV_PCM_RATE_88200  | SNDRV_PCM_RATE_96000 )

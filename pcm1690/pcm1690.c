@@ -29,29 +29,6 @@ struct snd_soc_card_drvdata_pcm1690 {
 	unsigned int codec_clock;
 	unsigned int rate; 
 };
-/*
-static const struct snd_soc_dapm_widget pcm1690_dapm_widgets2[] = {
-	SND_SOC_DAPM_OUTPUT("VOUT1"),
-	SND_SOC_DAPM_OUTPUT("VOUT2"),
-	SND_SOC_DAPM_OUTPUT("VOUT3"),
-	SND_SOC_DAPM_OUTPUT("VOUT4"),
-	SND_SOC_DAPM_OUTPUT("VOUT5"),
-	SND_SOC_DAPM_OUTPUT("VOUT6"),
-	SND_SOC_DAPM_OUTPUT("VOUT7"),
-	SND_SOC_DAPM_OUTPUT("VOUT8"),
-};
-
-static const struct snd_soc_dapm_route audio_map[] = {
-	{ "VOUT1", NULL, "Playback" }, 
-	{ "VOUT2", NULL, "Playback" },
-	{ "VOUT3", NULL, "Playback" },
-	{ "VOUT4", NULL, "Playback" },
-	{ "VOUT5", NULL, "Playback" },
-	{ "VOUT6", NULL, "Playback" },
-	{ "VOUT7", NULL, "Playback" }, //NC
-	{ "VOUT8", NULL, "Playback" }, //NC
-};
-*/
 
 /*
 //	Define Dynamic Audio Power Management (DAPM) widgets
@@ -185,7 +162,6 @@ static int snd_pcm1690_audiocard_init(struct snd_soc_pcm_runtime *rtd)
 	}
 	
 	//Configure TDM mode of CPU and audio codec interface
-		//(pcm1690 codec driver ignores TX mask width)
 	//arguments for tdm slot: dai_config, tx_mask, rx_mask, slots, bit width of slot
 	//tx and rx mask represent the active Xx slots, so for 8 output channels it has to be 8 slots
 	//codec dai has been set in the codec
@@ -198,6 +174,13 @@ static int snd_pcm1690_audiocard_init(struct snd_soc_pcm_runtime *rtd)
 		dev_err(codec_dai->dev, "Unable to set McASP TDM slots.\n");
 		return ret;
 	}
+	/*
+	ret = snd_soc_dai_set_tdm_slot(codec_dai, tdm_mask, tdm_mask, tdm_slots, 32);
+	if (ret < 0){
+		dev_err(codec_dai->dev, "Unable to reassert codec and McASP TDM slots.\n");
+		return ret;
+	}
+	*/
 	
 	return 0;
 }
@@ -211,7 +194,7 @@ static int snd_pcm1690_audiocard_hw_params(
 	//struct snd_soc_codec *codec = rtd->codec;
 	struct snd_soc_card *soc_card = rtd->card;
 	
-	unsigned int rate = params_rate(params);
+	//unsigned int rate = params_rate(params);
 	unsigned int cpu_clock = ((struct snd_soc_card_drvdata_pcm1690 *)
 		snd_soc_card_get_drvdata(soc_card))->sysclk;
 	unsigned int codec_clock = ((struct snd_soc_card_drvdata_pcm1690 *)
@@ -228,8 +211,10 @@ static int snd_pcm1690_audiocard_hw_params(
 		dev_err(codec->dev, "Unable to set PCM1690 system clock: %d.\n", ret);
 		return ret;
 	}*/
+	
+	//master output clock
 	dev_dbg(cpu_dai->dev, "Set codec DAI clock rate to %d.\n", codec_clock);
-	ret = snd_soc_dai_set_sysclk(cpu_dai, 0,cpu_clock, SND_SOC_CLOCK_OUT); //SND_SOC_CLOCK_OUT
+	ret = snd_soc_dai_set_sysclk(cpu_dai, 0, cpu_clock, SND_SOC_CLOCK_OUT);
 	if (ret < 0){
 		dev_err(cpu_dai->dev, "Unable to set cpu dai sysclk: %d.\n", ret);
 		return ret;
@@ -274,11 +259,9 @@ static struct snd_soc_ops snd_pcm1690_audiocard_ops = {
 	.startup = snd_pcm1690_audiocard_startup,
 	.shutdown = snd_pcm1690_audiocard_shutdown,
 };
-
-
 //in dsp_A, L data MSB after FRM LRC as in pcm1690 datasheet for TDM
-//set format to DSP_A, inverse frame, normal bitclock, and codec slave (pcm1690 is always set to slave mode)
-#define AUDIOCARD_1690_DAIFMT ( SND_SOC_DAIFMT_DSP_A | SND_SOC_DAIFMT_NB_NF | SND_SOC_DAIFMT_CBS_CFS )
+//set format to DSP_A, normal frame, normal bitclock, and codec is a slave (pcm1690 is always set to slave mode)
+#define AUDIOCARD_1690_DAIFMT ( SND_SOC_DAIFMT_DSP_A | SND_SOC_DAIFMT_NB_NF | SND_SOC_DAIFMT_CBS_CFS)
 
 //link between cpu dai and codec dai
 static struct snd_soc_dai_link BBB_snd_pcm1690_audiocard_dai = {
@@ -289,7 +272,10 @@ static struct snd_soc_dai_link BBB_snd_pcm1690_audiocard_dai = {
 	.codec_dai_name	= "pcm1690-hifi", //from snd_soc_dai_driver .name 
 	//.platform_name	= "mcasp-controller", //not to be used
 	//.codec_name	= "pcm1690.1-004c", //i2c-1@4c, device tree will add this?!?
-	.dai_fmt	= AUDIOCARD_1690_DAIFMT,
+	
+	.dai_fmt	=	AUDIOCARD_1690_DAIFMT,
+	//.dai_fmt	= SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF | //PCM data format i2s,normal bitclock and frame
+				//SND_SOC_DAIFMT_CBS_CFS, //format slave, pcm1690 is a slave!
 	.ops		= &snd_pcm1690_audiocard_ops,
 	.init		= snd_pcm1690_audiocard_init,
 };

@@ -1,5 +1,5 @@
-//dtc -O dtb -o pcm1690-overlay-00A0.dtbo -b 0 -@ pcm1690-overlay.dts
-//sudo cp pcm1690-overlay-00A0.dtbo /boot/overlays
+//dtc -O dtb -o pcm1690-overlay-00A0.dtbo -b 0 -@ pcm1690-overlay-00A0.dts
+//sudo cp pcm1690-overlay-00A0.dtbo /lib/firmware
 
 /dts-v1/;
 /plugin/;
@@ -8,7 +8,7 @@
 	compatible = "ti,beaglebone-black";
 	    /* identification */
         part-number = "pcm1690-overlay";
-        version = "00A0";
+        version = "00A0","A0";
 	
 	exclusive-use =
 		// audio 
@@ -65,8 +65,6 @@
 					//0x1a8 0x07		// Y4 oscillator off, v17 ball,	MODE7 | OUTPUT_PULLDOWN | GPIO1_27 
 				>;
 			};
-			
-
 		};
 	};
 	
@@ -74,29 +72,24 @@
 	fragment@1 {
 		target = <&i2c1>;
 		__overlay__ {
-			pinctrl-names = "default";
-			pinctrl-0 = <&audiocard_i2c1_pins>;
 			status = "okay";
 			clock-frequency = <100000>; //100khz
+			pinctrl-names = "default";
+			pinctrl-0 = <&audiocard_i2c1_pins>;
 			
-			// avoid dtc warnings 			
 			#address-cells = <1>;
 			#size-cells = <0>;
-			
-			pcm1690: pcm1690@4c{
-				//#address-cells = <1>;
-				//#size-cells = <0>;
+			pcm1690: pcm1690@4c{					
 				//#sound-dai-cells = <0>;
 				compatible = "ti,pcm1690";
 				reg = <0x4c>; //should be 4c
-				
+				status = "okay";
 			};
 			
-			rtc: rtc@68 {
-				#address-cells = <1>;
-				#size-cells = <0>;
+			rtc@68 {
                 compatible = "dallas,ds1307"; //really a DS3231
                 reg = <0x68>;
+				status = "okay";
             };
 			
 			//add other devices here that are in i2c-1 bus
@@ -112,7 +105,7 @@
 
 			status = "okay";
 		
-			op-mode = <0>;	/* MCASP_IIS_MODE */
+			op-mode = <0>;	/* MCASP_in i2s mode, 1 for DIT mode */
 			tdm-slots = <8>;
 			num-serializer = <16>;
 			serial-dir = <  /* 0: INACTIVE, 1: TX, 2: RX */
@@ -164,12 +157,12 @@
 				mcasp-controller-bit-delay-rx = <0>;
 				/*
 				audio-routing =
-					"Speaker Out",            "VOUT1",
-					"Speaker Out",            "VOUT2",
-					"Speaker Out",            "VOUT3",
-					"Speaker Out", 			  "VOUT4",
-					"Line Out",         	  "VOUT5",
-					"Line Out",          	  "VOUT6";
+					"Speaker Out",            "FLOUT",
+					"Speaker Out",            "FROUT",
+					"Speaker Out",            "RLOUT",
+					"Speaker Out", 			  "RROUT",
+					"Line Out",         	  "VLINE1",
+					"Line Out",          	  "VLINE2";
 					//"Line Out",             "VOUT7",
 					//"Line Out", 			 "VOUT8";
 				*/

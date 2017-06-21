@@ -50,7 +50,7 @@ static const struct reg_default pcm1690_reg_defaults[] = {
 	{ 0x4d,	0x4D },
 	{ 0x4e,	0x00 }, //mute
 	{ 0x4f,	0x00 }, //mute
-	{ 0x40,	0b00000010}, //set to dual rate 0x02
+	{ 0x40,	0b11000000},//on auto rate //set to dual rate 0x02
 };
 
 
@@ -120,6 +120,28 @@ static const struct snd_kcontrol_new pcm1690_controls[] = { //independent channe
 };
 
 static const struct snd_soc_dapm_widget pcm1690_dapm_widgets[] = {
+	SND_SOC_DAPM_OUTPUT("FLOUT"),
+	SND_SOC_DAPM_OUTPUT("FROUT"),
+	SND_SOC_DAPM_OUTPUT("RLOUT"),
+	SND_SOC_DAPM_OUTPUT("RROUT"),
+	SND_SOC_DAPM_OUTPUT("VLINE1"),
+	SND_SOC_DAPM_OUTPUT("VLINE2"),
+	SND_SOC_DAPM_OUTPUT("VOUT7"),
+	SND_SOC_DAPM_OUTPUT("VOUT8"),
+};
+
+static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
+	{ "FLOUT", NULL, "Front Left" }, 
+	{ "FROUT", NULL, "Front Right" },
+	{ "RLOUT", NULL, "Rear Left" },
+	{ "RROUT", NULL, "Rear Right" },
+	{ "VLINE1", NULL, "LLOUT" },
+	{ "VLINE2", NULL, "RLOUT" },
+	{ "VOUT7", NULL, "dac7OUT" }, //NC
+	{ "VOUT8", NULL, "dac8OUT" }, //NC
+};
+/*
+static const struct snd_soc_dapm_widget pcm1690_dapm_widgets[] = {
 	SND_SOC_DAPM_OUTPUT("VOUT1"),
 	SND_SOC_DAPM_OUTPUT("VOUT2"),
 	SND_SOC_DAPM_OUTPUT("VOUT3"),
@@ -140,18 +162,8 @@ static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
 	{ "VOUT7", NULL, "Playback" }, //NC
 	{ "VOUT8", NULL, "Playback" }, //NC
 };
-/*
-static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
-	{ "VOUT1", NULL, "Front Left" }, 
-	{ "VOUT2", NULL, "Front Right" },
-	{ "VOUT3", NULL, "Rear Left" },
-	{ "VOUT4", NULL, "Rear Right" },
-	{ "VOUT5", NULL, "LLOUT" },
-	{ "VOUT6", NULL, "RLOUT" },
-	{ "VOUT7", NULL, "audiocard7OUT" }, //NC
-	{ "VOUT8", NULL, "audiocard8OUT" }, //NC
-};
 */
+
  /* ---------------------------------------------------------------------
  * Digital Audio Interface Definition
  */
@@ -176,7 +188,7 @@ static bool pcm1690_writeable_reg(struct device *dev, unsigned register reg)
 			      unsigned int format)
 {
 	struct snd_soc_codec *codec = codec_dai->codec;
-	struct pcm1690_private *priv = snd_soc_codec_get_drvdata(codec_dai->codec);
+	struct pcm1690_private *priv = snd_soc_codec_get_drvdata(codec);
 
 	// The pcm1690 can only be slave to all clocks 
 	if ((format & SND_SOC_DAIFMT_MASTER_MASK) != SND_SOC_DAIFMT_CBS_CFS) {
@@ -194,12 +206,12 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 			     struct snd_soc_dai *dai)
 {
 	
-	struct snd_soc_codec *codec = codec_dai->codec;
+	struct snd_soc_codec *codec = dai->codec;
 	struct pcm1690_private *priv = snd_soc_codec_get_drvdata(codec);
 	int val = 0, ret;
 
 	priv->rate = params_rate(params); //input stream khz
-	priv->format = params_width(params); //input stream in bits
+	//priv->format = params_width(params); //input stream in bits
 	
 	switch (priv->format & SND_SOC_DAIFMT_FORMAT_MASK) {
 	case SND_SOC_DAIFMT_I2S:
@@ -237,7 +249,7 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 		switch (params_width(params)) {
 			case 24:
 				val=0x07; //basic left justified TDM <=48khz
-				if((priv->rate) > 48000){
+				if(params_rate(params) > 48000){
 					val=0x09; //left justified fast mode > 48khz	
 				}
 				break;
@@ -245,33 +257,40 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 				val=0x01; //0001 left justified 16/20/24/32 stereo
 		}
 		break;*/
-	//on TDM mode this and dsp_b are the only modes that pcm1690 supports	
+	//on TDM mode this and dsp_b are the only modes that pcm1690 supports		
 	case SND_SOC_DAIFMT_DSP_A: // dsp_A, L data MSB after FRM LRC drops as in pcm1690 datasheet for TDM
 		switch (params_width(params)) {
 			case 24:
 				//val=0x04; //dsp i2s
 				val=0x06; //basic TDM <=48khz
-				if((priv->rate) > 48000){
+				if(params_rate(params) > 48000){
 					val=0x08; //fast mode > 48khz	
 				}
 				break;
-			default: //testing, speaker-test doesn't support 24bit output
+				/*
+			default: 	//testing speaker-test doesn't support 24bit output, 
+						//so force 16bit testing in 24bit mode, will sound horrible!!!
 				val=0x06; //basic TDM <=48khz
-				if((priv->rate) > 48000){
+				if(params_rate(params) > 48000){
 					val=0x08; //fast mode > 48khz
 					//dev_info(codec->dev, "fast mode");
 				}
-				//dev_info(codec->dev, "Used default DPS_A")			
+				//dev_info(codec->dev, "Used default DPS_A");
+				*/
 		}
 		break;	
-		
-	default:
-		/*val=0x06; //basic TDM <=48khz
-				if((priv->rate) > 48000){
-					val=0x08; //fast mode > 48khz	
+	// dsp_B, chan1 data MSB during FRM LRC drops as in pcm1690 datasheet for left justified TDM		
+	case SND_SOC_DAIFMT_DSP_B: 
+		if(params_width(params)==24) {
+				val=0x07; //basic TDM <=48khz
+				if(params_rate(params) > 48000){
+					val=0x09; //fast mode > 48khz	
 				}
-		dev_info(codec->dev, "Used default format");
-		*/
+				break;
+		}
+		break;		
+
+	default:
 		dev_err(codec->dev, "Invalid sound output format\n");
 		return -EINVAL;
 	}
@@ -286,7 +305,7 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 
 static int pcm1690_digital_mute(struct snd_soc_dai *dai, int mute)
 {
-	//struct snd_soc_codec *codec = dai->codec;
+	struct snd_soc_codec *codec = dai->codec;
 	struct pcm1690_private *priv = snd_soc_codec_get_drvdata(codec);
 	int val;
 
@@ -301,6 +320,9 @@ static int pcm1690_digital_mute(struct snd_soc_dai *dai, int mute)
 static int pcm1690_set_tdm_slots(struct snd_soc_dai *dai, unsigned int tx_mask,
 			       unsigned int rx_mask, int slots, int width)
 {
+	
+	
+	
 	return 0;
 }	
 */
