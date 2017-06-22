@@ -376,7 +376,7 @@ int pcm1690_codec_probe(struct device *dev, struct regmap *regmap)
 {
 	struct pcm1690_private *priv;
 	int ret=0;// ret2;
-	int times=0;
+	
 		
 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
 	if (priv == NULL){
@@ -392,18 +392,20 @@ int pcm1690_codec_probe(struct device *dev, struct regmap *regmap)
 	// Reset the device, verifying I/O in the process for I2C 
 	ret = regmap_write_bits(regmap, PCM1690_SYS_RESET_register, 0x40 ,PCM1690_SYS_RESET); //will return 0 if success
 	if (ret != 0) {
-		//msleep(1);
-		while(ret !=0 && times <= 100){
-			times++;
+		msleep(1);
+		ret = regmap_write_bits(regmap, PCM1690_SYS_RESET_register, 0xC0,0); //try again, may make a pop noise
+			}
+			
+		if (ret !=0 ){
+			msleep(2);
 			ret = regmap_write_bits(regmap, PCM1690_SYS_RESET_register, 0xC0,0); //try again, may make a pop noise
-			msleep(1);	
 		}
 		if (ret != 0) {
 			dev_err(dev, "Failed to reset device: %d\n", ret);
 			return ret;
 		}
 			
-	}
+	
 	// Internal reset is de-asserted after 3846 SCKI cycles 
 	//msleep(DIV_ROUND_UP(3846 * 1000, 11289600)); //wait atleast this long
 	msleep(1);
