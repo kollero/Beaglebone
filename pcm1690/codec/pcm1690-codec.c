@@ -108,15 +108,15 @@ static int pcm1690_put_deemph(struct snd_kcontrol *kcontrol,
 static const DECLARE_TLV_DB_SCALE(pcm1690_dac_tlv, -6350, 50, 1);
 
 static const struct snd_kcontrol_new pcm1690_controls[] = { //independent channel volume controls
-	SOC_SINGLE_TLV("Front Left Volume",PCM1690_ATT_CONTROL(1),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Front Right Volume",PCM1690_ATT_CONTROL(2),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Rear Left Volume",PCM1690_ATT_CONTROL(3),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Rear Right Volume",PCM1690_ATT_CONTROL(4),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("LLOUT Volume",PCM1690_ATT_CONTROL(5),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("RLOUT Volume",PCM1690_ATT_CONTROL(6),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 7 Volume",PCM1690_ATT_CONTROL(7),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 8 Volume",PCM1690_ATT_CONTROL(8),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_BOOL_EXT("De-emphasis Switch", 0,pcm1690_get_deemph, pcm1690_put_deemph),//de-emphasis control	
+	SOC_SINGLE_TLV("AFL Volume",PCM1690_ATT_CONTROL(1),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("AFR Volume",PCM1690_ATT_CONTROL(2),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("ARL Volume",PCM1690_ATT_CONTROL(3),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("ARR Volume",PCM1690_ATT_CONTROL(4),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("BLOUT Volume",PCM1690_ATT_CONTROL(5),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("BROUT Volume",PCM1690_ATT_CONTROL(6),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Qc7 Volume",PCM1690_ATT_CONTROL(7),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Qc8 Volume",PCM1690_ATT_CONTROL(8),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_BOOL_EXT("W.De-emphasis Switch", 0,pcm1690_get_deemph, pcm1690_put_deemph),//de-emphasis control	
 };
 
 static const struct snd_soc_dapm_widget pcm1690_dapm_widgets[] = {
@@ -374,7 +374,8 @@ static struct snd_soc_codec_driver pcm1690_codec_driver = { //soc_codec_dev_pcm1
 int pcm1690_codec_probe(struct device *dev, struct regmap *regmap)
 {
 	struct pcm1690_private *priv;
-	int ret;// ret2;
+	int ret=0;// ret2;
+	int times=0;
 		
 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
 	if (priv == NULL){
@@ -390,12 +391,17 @@ int pcm1690_codec_probe(struct device *dev, struct regmap *regmap)
 	// Reset the device, verifying I/O in the process for I2C 
 	ret = regmap_write_bits(regmap, PCM1690_SYS_RESET_register, 0x40 ,PCM1690_SYS_RESET); //will return 0 if success
 	if (ret != 0) {
-		msleep(1);
-		ret = regmap_write_bits(regmap, PCM1690_SYS_RESET_register, 0xC0,0); //try again, may make a pop noise
+		//msleep(1);
+		while(ret !=0 | times >= 100){
+			times++;
+			ret = regmap_write_bits(regmap, PCM1690_SYS_RESET_register, 0xC0,0); //try again, may make a pop noise
+			msleep(1);	
+		}
 		if (ret != 0) {
 			dev_err(dev, "Failed to reset device: %d\n", ret);
 			return ret;
-		}	
+		}
+			
 	}
 	// Internal reset is de-asserted after 3846 SCKI cycles 
 	//msleep(DIV_ROUND_UP(3846 * 1000, 11289600)); //wait atleast this long
