@@ -392,7 +392,7 @@ int pcm1690_codec_probe(struct device *dev, struct regmap *regmap)
 	ret = regmap_write_bits(regmap, PCM1690_SYS_RESET_register, 0x40 ,PCM1690_SYS_RESET); //will return 0 if success
 	if (ret != 0) {
 		//msleep(1);
-		while(ret !=0 | times >= 100){
+		while(ret !=0 || times <= 100){
 			times++;
 			ret = regmap_write_bits(regmap, PCM1690_SYS_RESET_register, 0xC0,0); //try again, may make a pop noise
 			msleep(1);	
