@@ -12,7 +12,7 @@
 				| SNDRV_PCM_FMTBIT_S32_LE ) 
 				 //last one not supported in TDM mode
 */
-#define PCM1690_FORMATS ( SNDRV_PCM_FMTBIT_S24_LE  )
+//#define PCM1690_FORMATS ( SNDRV_PCM_FMTBIT_S24_LE  )
 
 				 
 				 //only 44.1 and 48khz multiple freqs is supported to the master clock with 256 fs single or dual rate

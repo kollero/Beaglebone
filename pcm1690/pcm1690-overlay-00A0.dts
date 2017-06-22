@@ -24,7 +24,7 @@
 		"P9_16", //speed rate
 		"P9.24", //i2c
         "P9.26",	//i2c
-		"GPIO1_27", //Y4 
+		"GPIO1_27", //Y4 oscillator
         //"i2c1_scl",
         //"i2c1_sda",
 		"mcasp0","i2c1";
@@ -149,8 +149,8 @@
 				audiocard-tdm-slots = <8>;
 				codec-clock-rate = <24576000>;
 				cpu-clock-rate = <24576000>;
-				//codec-clock-rate = <12880000>;
-				//cpu-clock-rate = <12880000>;
+				//codec-clock-rate = <24000000>;
+				//cpu-clock-rate = <24000000>;
 				audio-codec-bit-delay-dac = <1>;
 				audio-codec-bit-delay-adc = <0>;
 				mcasp-controller-bit-delay-tx = <0>;

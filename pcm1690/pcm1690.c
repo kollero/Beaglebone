@@ -150,7 +150,7 @@ static int snd_pcm1690_audiocard_init(struct snd_soc_pcm_runtime *rtd)
 		snd_soc_dapm_add_routes(&card->dapm, audio_map, ARRAY_SIZE(audio_map));
 	}
 	*/
-		
+		/*
 	ret = of_property_read_u32(np, "audiocard-tdm-slots", &tdm_slots);
 	if (tdm_slots > 8 || tdm_slots < 2 || ret){
 			dev_dbg(card->dev, "Couldn't get device tree property for tdm slots. Using default (=2).\n");
@@ -160,7 +160,7 @@ static int snd_pcm1690_audiocard_init(struct snd_soc_pcm_runtime *rtd)
 			tdm_mask = 0xFF;
 			tdm_mask = tdm_mask >> (8 - tdm_slots);
 	}
-	
+	*/
 	//Configure TDM mode of CPU and audio codec interface
 	//arguments for tdm slot: dai_config, tx_mask, rx_mask, slots, bit width of slot
 	//tx and rx mask represent the active Xx slots, so for 8 output channels it has to be 8 slots
@@ -168,8 +168,8 @@ static int snd_pcm1690_audiocard_init(struct snd_soc_pcm_runtime *rtd)
 	
 	//ret = snd_soc_of_parse_audio_routing(card, "audio-routing");
 	
-	//ret = snd_soc_dai_set_tdm_slot(cpu_dai, 0xFF, 0, 8, 32);
-	ret = snd_soc_dai_set_tdm_slot(cpu_dai, tdm_mask, tdm_mask, tdm_slots, 32);
+	ret = snd_soc_dai_set_tdm_slot(cpu_dai, 0xFF, 0, 8, 32);
+	//ret = snd_soc_dai_set_tdm_slot(cpu_dai, tdm_mask, tdm_mask, tdm_slots, 32);
 	if (ret < 0){
 		dev_err(codec_dai->dev, "Unable to set McASP TDM slots.\n");
 		return ret;

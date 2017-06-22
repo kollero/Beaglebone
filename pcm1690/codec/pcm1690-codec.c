@@ -50,7 +50,7 @@ static const struct reg_default pcm1690_reg_defaults[] = {
 	{ 0x4d,	0x4D },
 	{ 0x4e,	0x00 }, //mute
 	{ 0x4f,	0x00 }, //mute
-	{ 0x40,	0b11000000},//on auto rate //set to dual rate 0x02
+	{ 0x40,	0b00000000},//on auto rate //set to dual rate 0x02
 };
 
 
@@ -108,17 +108,17 @@ static int pcm1690_put_deemph(struct snd_kcontrol *kcontrol,
 static const DECLARE_TLV_DB_SCALE(pcm1690_dac_tlv, -6350, 50, 1);
 
 static const struct snd_kcontrol_new pcm1690_controls[] = { //independent channel volume controls
-	SOC_SINGLE_TLV("AFL Volume",PCM1690_ATT_CONTROL(1),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("AFR Volume",PCM1690_ATT_CONTROL(2),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("ARL Volume",PCM1690_ATT_CONTROL(3),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("ARR Volume",PCM1690_ATT_CONTROL(4),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("BLOUT Volume",PCM1690_ATT_CONTROL(5),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("BROUT Volume",PCM1690_ATT_CONTROL(6),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Qc7 Volume",PCM1690_ATT_CONTROL(7),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Qc8 Volume",PCM1690_ATT_CONTROL(8),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_BOOL_EXT("W.De-emphasis Switch", 0,pcm1690_get_deemph, pcm1690_put_deemph),//de-emphasis control	
+	SOC_SINGLE_TLV("Channel 1 Volume",PCM1690_ATT_CONTROL(1),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Channel 2 Volume",PCM1690_ATT_CONTROL(2),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Channel 3 Volume",PCM1690_ATT_CONTROL(3),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Channel 4 Volume",PCM1690_ATT_CONTROL(4),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Channel 5 Volume",PCM1690_ATT_CONTROL(5),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Channel 6 Volume",PCM1690_ATT_CONTROL(6),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Channel 7 Volume",PCM1690_ATT_CONTROL(7),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Channel 8 Volume",PCM1690_ATT_CONTROL(8),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_BOOL_EXT("De-emphasis Switch", 0,pcm1690_get_deemph, pcm1690_put_deemph),//de-emphasis control	
 };
-
+/*
 static const struct snd_soc_dapm_widget pcm1690_dapm_widgets[] = {
 	SND_SOC_DAPM_OUTPUT("FLOUT"),
 	SND_SOC_DAPM_OUTPUT("FROUT"),
@@ -129,7 +129,7 @@ static const struct snd_soc_dapm_widget pcm1690_dapm_widgets[] = {
 	SND_SOC_DAPM_OUTPUT("VOUT7"),
 	SND_SOC_DAPM_OUTPUT("VOUT8"),
 };
-/*
+
 static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
 	{ "FLOUT", NULL, "Front Left" }, 
 	{ "FROUT", NULL, "Front Right" },
@@ -140,7 +140,7 @@ static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
 	{ "VOUT7", NULL, "dac7OUT" }, //NC
 	{ "VOUT8", NULL, "dac8OUT" }, //NC
 };
-*/
+
 
 static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
 	{ "FLOUT", NULL, "Playback" }, 
@@ -152,8 +152,8 @@ static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
 	{ "VOUT7", NULL, "Playback" }, //NC
 	{ "VOUT8", NULL, "Playback" }, //NC
 };
+*/
 
-/*
 static const struct snd_soc_dapm_widget pcm1690_dapm_widgets[] = {
 	SND_SOC_DAPM_OUTPUT("VOUT1"),
 	SND_SOC_DAPM_OUTPUT("VOUT2"),
@@ -175,7 +175,7 @@ static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
 	{ "VOUT7", NULL, "Playback" }, //NC
 	{ "VOUT8", NULL, "Playback" }, //NC
 };
-*/
+
 
  /* ---------------------------------------------------------------------
  * Digital Audio Interface Definition
@@ -354,7 +354,7 @@ static struct snd_soc_dai_driver pcm1690_dai = {
 		.channels_min = 2, //2
 		.channels_max = 8, //8 outputs in total 
 		.rates = PCM1690_PCM_RATES,//SNDRV_PCM_RATE_48000,//PCM1690_PCM_RATES,
-		.formats = PCM1690_FORMATS,//SNDRV_PCM_FMTBIT_S24_LE, //in .h file only 24bits supported in TDM mode
+		.formats = SNDRV_PCM_FMTBIT_S24_LE,//PCM1690_FORMATS,// //in .h file only 24bits supported in TDM mode
 	},
 	.ops = &pcm1690_dai_ops,
 };
