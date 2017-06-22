@@ -10,7 +10,7 @@ sudo apt-get install linux-headers-$(uname -r)
 to install modules, ssh to beaglebone and:
 git clone https://github.com/kollero/Beaglebone
 
-
+cd Beaglebone
 cd pcm1690
 make all install
 cd codec
@@ -29,7 +29,7 @@ disable universal cape and hdmi audio
 
 to check if it really works cannot use speaker-test since it doesn't support 24bit...
 
-reboot and check if it works with:
+//reboot and check if it works with:
 speaker-test -t sine -f 10000 -c 1 -r 48000
 
 
