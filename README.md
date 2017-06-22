@@ -8,7 +8,7 @@ sudo apt-get update
 sudo apt-get install linux-headers-$(uname -r)
 
 to install modules, ssh to beaglebone and:
-git clone https://github.com/kollero/Beaglebone/pcm1690
+git clone https://github.com/kollero/Beaglebone
 
 
 cd pcm1690
