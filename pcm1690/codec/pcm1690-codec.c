@@ -108,14 +108,14 @@ static int pcm1690_put_deemph(struct snd_kcontrol *kcontrol,
 static const DECLARE_TLV_DB_SCALE(pcm1690_dac_tlv, -6350, 50, 1);
 
 static const struct snd_kcontrol_new pcm1690_controls[] = { //independent channel volume controls
-	SOC_SINGLE_TLV("Channel 1 Volume",PCM1690_ATT_CONTROL(1),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 2 Volume",PCM1690_ATT_CONTROL(2),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 3 Volume",PCM1690_ATT_CONTROL(3),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 4 Volume",PCM1690_ATT_CONTROL(4),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 5 Volume",PCM1690_ATT_CONTROL(5),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 6 Volume",PCM1690_ATT_CONTROL(6),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 7 Volume",PCM1690_ATT_CONTROL(7),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 8 Volume",PCM1690_ATT_CONTROL(8),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("C1 Volume",PCM1690_ATT_CONTROL(1),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("C2 Volume",PCM1690_ATT_CONTROL(2),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("C3 Volume",PCM1690_ATT_CONTROL(3),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("C4 Volume",PCM1690_ATT_CONTROL(4),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("C5L Volume",PCM1690_ATT_CONTROL(5),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("C6R Volume",PCM1690_ATT_CONTROL(6),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("NC7 Volume",PCM1690_ATT_CONTROL(7),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("NC8 Volume",PCM1690_ATT_CONTROL(8),0,0x7f, 0, pcm1690_dac_tlv),
 	SOC_SINGLE_BOOL_EXT("De-emphasis Switch", 0,pcm1690_get_deemph, pcm1690_put_deemph),//de-emphasis control	
 };
 /*
@@ -280,7 +280,7 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 					val=0x08; //fast mode > 48khz	
 				}
 				break;
-				/*
+				
 			default: 	//testing speaker-test doesn't support 24bit output, 
 						//so force 16bit testing in 24bit mode, will sound horrible!!!
 				val=0x06; //basic TDM <=48khz
@@ -288,8 +288,8 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 					val=0x08; //fast mode > 48khz
 					//dev_info(codec->dev, "fast mode");
 				}
-				//dev_info(codec->dev, "Used default DPS_A");
-				*/
+				dev_info(codec->dev, "Used default DPS_A");
+				
 		}
 		break;	
 	// dsp_B, chan1 data MSB during FRM LRC drops as in pcm1690 datasheet for left justified TDM		

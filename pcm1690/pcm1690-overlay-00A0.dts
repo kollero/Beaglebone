@@ -147,10 +147,10 @@
 				audio-codec = <&pcm1690>;
 				mcasp-controller = <&mcasp0>;
 				audiocard-tdm-slots = <8>;
-				codec-clock-rate = <24576000>;
-				cpu-clock-rate = <24576000>;
-				//codec-clock-rate = <24000000>;
-				//cpu-clock-rate = <24000000>;
+				//codec-clock-rate = <24576000>;
+				//cpu-clock-rate = <24576000>;
+				codec-clock-rate = <24001400>;
+				cpu-clock-rate = <24001400>;
 				audio-codec-bit-delay-dac = <1>;
 				audio-codec-bit-delay-adc = <0>;
 				mcasp-controller-bit-delay-tx = <0>;
