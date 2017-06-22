@@ -16,6 +16,7 @@ make all install
 
 cd codec;
 make all install
+
 cd ..
 
 dtc -O dtb -o pcm1690-overlay-00A0.dtbo -b 0 -@ pcm1690-overlay-00A0.dts
