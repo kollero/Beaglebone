@@ -108,17 +108,17 @@ static int pcm1690_put_deemph(struct snd_kcontrol *kcontrol,
 static const DECLARE_TLV_DB_SCALE(pcm1690_dac_tlv, -6350, 50, 1);
 
 static const struct snd_kcontrol_new pcm1690_controls[] = { //independent channel volume controls
-	SOC_SINGLE_TLV("Channel 1 Volume",PCM1690_ATT_CONTROL(1),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 2 Volume",PCM1690_ATT_CONTROL(2),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 3 Volume",PCM1690_ATT_CONTROL(3),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 4 Volume",PCM1690_ATT_CONTROL(4),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 5 Volume",PCM1690_ATT_CONTROL(5),0,0x7f, 0, pcm1690_dac_tlv),
-	SOC_SINGLE_TLV("Channel 6 Volume",PCM1690_ATT_CONTROL(6),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Front Left Volume",PCM1690_ATT_CONTROL(1),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Front Right Volume",PCM1690_ATT_CONTROL(2),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Rear Left Volume",PCM1690_ATT_CONTROL(3),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("Rear Right Volume",PCM1690_ATT_CONTROL(4),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("LLOUT Volume",PCM1690_ATT_CONTROL(5),0,0x7f, 0, pcm1690_dac_tlv),
+	SOC_SINGLE_TLV("RLOUT Volume",PCM1690_ATT_CONTROL(6),0,0x7f, 0, pcm1690_dac_tlv),
 	SOC_SINGLE_TLV("Channel 7 Volume",PCM1690_ATT_CONTROL(7),0,0x7f, 0, pcm1690_dac_tlv),
 	SOC_SINGLE_TLV("Channel 8 Volume",PCM1690_ATT_CONTROL(8),0,0x7f, 0, pcm1690_dac_tlv),
 	SOC_SINGLE_BOOL_EXT("De-emphasis Switch", 0,pcm1690_get_deemph, pcm1690_put_deemph),//de-emphasis control	
 };
-
+/*
 static const struct snd_soc_dapm_widget pcm1690_dapm_widgets[] = {
 	SND_SOC_DAPM_OUTPUT("FLOUT"),
 	SND_SOC_DAPM_OUTPUT("FROUT"),
@@ -129,7 +129,7 @@ static const struct snd_soc_dapm_widget pcm1690_dapm_widgets[] = {
 	SND_SOC_DAPM_OUTPUT("VOUT7"),
 	SND_SOC_DAPM_OUTPUT("VOUT8"),
 };
-
+*/
 static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
 	{ "FLOUT", NULL, "Front Left" }, 
 	{ "FROUT", NULL, "Front Right" },
@@ -140,6 +140,19 @@ static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
 	{ "VOUT7", NULL, "dac7OUT" }, //NC
 	{ "VOUT8", NULL, "dac8OUT" }, //NC
 };
+
+
+static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
+	{ "FLOUT", NULL, "Playback" }, 
+	{ "FROUT", NULL,"Playback" },
+	{ "RLOUT", NULL, "Playback" },
+	{ "RROUT", NULL, "Playback"},
+	{ "VLINE1", NULL, "Playback" },
+	{ "VLINE2", NULL, "Playback" },
+	{ "VOUT7", NULL, "Playback" }, //NC
+	{ "VOUT8", NULL, "Playback" }, //NC
+};
+
 /*
 static const struct snd_soc_dapm_widget pcm1690_dapm_widgets[] = {
 	SND_SOC_DAPM_OUTPUT("VOUT1"),
