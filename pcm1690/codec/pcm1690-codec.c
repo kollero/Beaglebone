@@ -118,7 +118,7 @@ static const struct snd_kcontrol_new pcm1690_controls[] = { //independent channe
 	SOC_SINGLE_TLV("Channel 8 Volume",PCM1690_ATT_CONTROL(8),0,0x7f, 0, pcm1690_dac_tlv),
 	SOC_SINGLE_BOOL_EXT("De-emphasis Switch", 0,pcm1690_get_deemph, pcm1690_put_deemph),//de-emphasis control	
 };
-/*
+
 static const struct snd_soc_dapm_widget pcm1690_dapm_widgets[] = {
 	SND_SOC_DAPM_OUTPUT("FLOUT"),
 	SND_SOC_DAPM_OUTPUT("FROUT"),
@@ -129,7 +129,7 @@ static const struct snd_soc_dapm_widget pcm1690_dapm_widgets[] = {
 	SND_SOC_DAPM_OUTPUT("VOUT7"),
 	SND_SOC_DAPM_OUTPUT("VOUT8"),
 };
-*/
+/*
 static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
 	{ "FLOUT", NULL, "Front Left" }, 
 	{ "FROUT", NULL, "Front Right" },
@@ -140,7 +140,7 @@ static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
 	{ "VOUT7", NULL, "dac7OUT" }, //NC
 	{ "VOUT8", NULL, "dac8OUT" }, //NC
 };
-
+*/
 
 static const struct snd_soc_dapm_route pcm1690_dapm_routes[] = {
 	{ "FLOUT", NULL, "Playback" }, 
