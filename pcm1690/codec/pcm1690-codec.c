@@ -50,7 +50,7 @@ static const struct reg_default pcm1690_reg_defaults[] = {
 	{ 0x4d,	0x4D },
 	{ 0x4e,	0x00 }, //mute
 	{ 0x4f,	0x00 }, //mute
-	{ 0x40,	0b00000000},//on auto rate //set to dual rate 0x02
+	{ 0x40,	0b11000000},//on auto rate //set to dual rate 0x02
 };
 
 
@@ -354,7 +354,7 @@ static struct snd_soc_dai_driver pcm1690_dai = {
 		.channels_min = 2, //2
 		.channels_max = 8, //8 outputs in total 
 		.rates = PCM1690_PCM_RATES,//SNDRV_PCM_RATE_48000,//PCM1690_PCM_RATES,
-		.formats = SNDRV_PCM_FMTBIT_S24_LE,//PCM1690_FORMATS,// //in .h file only 24bits supported in TDM mode
+		.formats = PCM1690_FORMATS,//SNDRV_PCM_FMTBIT_S24_LE, //in .h file only 24bits supported in TDM mode
 	},
 	.ops = &pcm1690_dai_ops,
 };

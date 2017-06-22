@@ -6,12 +6,12 @@
 
 #include <linux/pm.h>
 #include <linux/regmap.h>
-/*
+
 #define PCM1690_FORMATS ( SNDRV_PCM_FMTBIT_S16_LE  	\
 			    |	 SNDRV_PCM_FMTBIT_S24_LE  		\
 				| SNDRV_PCM_FMTBIT_S32_LE ) 
 				 //last one not supported in TDM mode
-*/
+
 //#define PCM1690_FORMATS ( SNDRV_PCM_FMTBIT_S24_LE  )
 
 				 
