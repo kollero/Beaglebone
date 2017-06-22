@@ -149,10 +149,10 @@
 				audiocard-tdm-slots = <8>;
 				codec-clock-rate = <24576000>; 
 				cpu-clock-rate = <24576000>; //has to be 24.576MHz even that it's in reality a 24MHz
-				//audio-codec-bit-delay-dac = <1>;
-				//audio-codec-bit-delay-adc = <0>;
-				//mcasp-controller-bit-delay-tx = <0>;
-				//mcasp-controller-bit-delay-rx = <0>;
+				audio-codec-bit-delay-dac = <1>;
+				audio-codec-bit-delay-adc = <0>;
+				mcasp-controller-bit-delay-tx = <0>;
+				mcasp-controller-bit-delay-rx = <0>;
 				/*
 				audio-routing =
 					"Speaker Out",            "FLOUT",

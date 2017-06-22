@@ -280,7 +280,7 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 					val=0x08; //fast mode > 48khz	
 				}
 				break;
-				/*
+				
 			default: 	//testing speaker-test doesn't support 24bit output, 
 						//so force 16bit testing in 24bit mode, will sound horrible!!!
 				val=0x06; //basic TDM <=48khz
@@ -288,8 +288,8 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 					val=0x08; //fast mode > 48khz
 					//dev_info(codec->dev, "fast mode");
 				}
-				dev_info(codec->dev, "Used default DPS_A");
-				*/
+				//dev_info(codec->dev, "Used default DPS_A");
+				
 		}
 		break;	
 		/*
@@ -393,7 +393,7 @@ int pcm1690_codec_probe(struct device *dev, struct regmap *regmap)
 	ret = regmap_write_bits(regmap, PCM1690_SYS_RESET_register, 0x40 ,PCM1690_SYS_RESET); //will return 0 if success
 	if (ret != 0) {
 		//msleep(1);
-		while(ret !=0 || times <= 100){
+		while(ret !=0 && times <= 100){
 			times++;
 			ret = regmap_write_bits(regmap, PCM1690_SYS_RESET_register, 0xC0,0); //try again, may make a pop noise
 			msleep(1);	
