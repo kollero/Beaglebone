@@ -280,7 +280,7 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 					val=0x08; //fast mode > 48khz	
 				}
 				break;
-				
+				/*
 			default: 	//testing speaker-test doesn't support 24bit output, 
 						//so force 16bit testing in 24bit mode, will sound horrible!!!
 				val=0x06; //basic TDM <=48khz
@@ -289,9 +289,10 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 					//dev_info(codec->dev, "fast mode");
 				}
 				dev_info(codec->dev, "Used default DPS_A");
-				
+				*/
 		}
 		break;	
+		/*
 	// dsp_B, chan1 data MSB during FRM LRC drops as in pcm1690 datasheet for left justified TDM		
 	case SND_SOC_DAIFMT_DSP_B: 
 		if(params_width(params)==24) {
@@ -302,7 +303,7 @@ static int pcm1690_hw_params(struct snd_pcm_substream *substream,
 				break;
 		}
 		break;		
-
+*/
 	default:
 		dev_err(codec->dev, "Invalid sound output format\n");
 		return -EINVAL;
@@ -354,7 +355,7 @@ static struct snd_soc_dai_driver pcm1690_dai = {
 		.channels_min = 2, //2
 		.channels_max = 8, //8 outputs in total 
 		.rates = PCM1690_PCM_RATES,//SNDRV_PCM_RATE_48000,//PCM1690_PCM_RATES,
-		.formats = PCM1690_FORMATS,//SNDRV_PCM_FMTBIT_S24_LE, //in .h file only 24bits supported in TDM mode
+		.formats = SNDRV_PCM_FMTBIT_S24_LE,//PCM1690_FORMATS,// //in .h file only 24bits supported in TDM mode
 	},
 	.ops = &pcm1690_dai_ops,
 };
